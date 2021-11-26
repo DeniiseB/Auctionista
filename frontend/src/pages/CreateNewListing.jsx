@@ -8,7 +8,7 @@ import CustomModal from "../components/CustomModal";
 
 function CreateNewListing() {
   const { postNewAuctionItem } = useAuctionItem();
-  const { getCurrentUser, currentUser } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [reservationPrice, setReservationPrice] = useState(0);
@@ -38,7 +38,6 @@ function CreateNewListing() {
   };
 
   const getChildData = (imgPaths, indexOfPrimaryImg) => {
-    //console.log("img paths are" + imgPaths + "and index of primary img is " + indexOfPrimaryImg);
     setIndexOfPrimaryImg(indexOfPrimaryImg);
     let arrayOfStrings = [];
     for (let path of imgPaths) {
@@ -73,10 +72,10 @@ function CreateNewListing() {
         sold: false,
         minimumBid: Math.round((110 / 100) * startPrice),
         owner: {
-          id: getCurrentUser().id,
-          fullName: getCurrentUser().fullName,
-          username: getCurrentUser().username,
-          email: getCurrentUser().email,
+          id: currentUser.id,
+          fullName: currentUser.fullName,
+          username: currentUser.username,
+          email: currentUser.email,
         },
       };
 
@@ -232,7 +231,7 @@ const styles = {
   },
 
   input: {
-    borderWidth: "0 0 1px 0" /* top right bottom left */,
+    borderWidth: "0 0 1px 0",
     borderStyle: "none none solid none",
     borderColor: "#f00 #0f0 white #ff0",
     backgroundColor: "rgb(226, 89, 55)",

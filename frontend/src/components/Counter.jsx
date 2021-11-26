@@ -26,8 +26,7 @@ function calcDiffInMinutes(dateA, dateB) {
 
 }
 
-
-export default ({ dateFrom }) => {
+function Counter({ dateFrom }) {
 
   let formattedTime = formatTime(dateFrom);
   const [currentDate, setCurrentDate] = useState(new Date());
@@ -56,6 +55,8 @@ export default ({ dateFrom }) => {
   );
 
 };
+
+export default Counter;
 
 const styles = {
   timeWrapper: {

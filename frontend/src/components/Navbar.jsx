@@ -1,16 +1,15 @@
 import React from "react";
 import "bootstrap/dist/css/bootstrap.css";
 import { UserContext } from "../contexts/UserContext";
-import { useState, useEffect, useContext } from "react";
+import { useState, useContext } from "react";
 import { NavDropdown } from "react-bootstrap";
 import { Login } from "../components/Login";
 import { Register } from "../components/Register";
 import { Link } from "react-router-dom";
 import Search from "./search/Search";
-import CustomModal from "./CustomModal";
 
 function Navbar() {
-  const { getCurrentUser, logout, whoAmI, currentUserId } =
+  const { currentUser, logout } =
     useContext(UserContext);
   const [login, setLogin] = useState(false);
   const [register, setRegister] = useState(false);
@@ -18,26 +17,14 @@ function Navbar() {
  
   const toggleLogin = () => setLogin(!login);
   const toggleRegister = () => setRegister(!register);
-  const [myProp, setMyProp] = useState({});
 
   const pull_data = (data) => {
     console.log(data);
     setShowPopup(data);
-    setMyProp({
-      show: false,
-    })
     setTimeout(function () {
       setShowPopup(false);
     }, 4000);
   };
-
-   
-
-  useEffect(() => {
-    getCurrentUser()
-    
-
-  }, []);
 
   return (
     <nav className="navbar navbar-expand-lg navbar-dark" style={styles.navbar}>
@@ -58,7 +45,7 @@ function Navbar() {
       <div>
         <Search />
       </div>
-      {!getCurrentUser() ? (
+      {!currentUser ? (
         <div style={styles.loginButtons}>
           <div>
             <button
@@ -93,7 +80,7 @@ function Navbar() {
             <NavDropdown
               style={{ fontFamily: "Montserrat, sans-serif" }}
               id="nav-dropdown-dark-example"
-              title={"Hello " + getCurrentUser().username}
+              title={"Hello " + currentUser.username}
               menuVariant="dark"
             >
               <NavDropdown.Item>

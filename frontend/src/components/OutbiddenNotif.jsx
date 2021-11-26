@@ -1,23 +1,16 @@
-import { render } from '@testing-library/react';
-import React, {useState, useEffect, useContext} from 'react'
+import React, {useState, useEffect} from 'react'
 import { useSocketContext } from "../contexts/SocketContext";
-import { UserContext } from "../contexts/UserContext";
 import { Link } from "react-router-dom";
 
 function OutbiddenNotif() {
   const { socket } = useSocketContext();
-  const [myNotif, setMyNotif] = useState(false)
-  const { whoAmI, getCurrentUser, currentUserId } = useContext(UserContext);
   const [notif, setNotif] = useState({})
   const [renderPopup, setRenderPopup] = useState(false)
 
  
 
-  useEffect(async () => {
-  
-    onOutbidden()
-     
-    
+  useEffect(() => {
+    onOutbidden()   
   }, [])
   
     const onOutbidden = () => {
@@ -30,7 +23,6 @@ function OutbiddenNotif() {
           }),
         });
         res = await res.json();
-        let newData=JSON.stringify(data)
         if (res.id == data.toWho) {
           console.log("this is your notification!")
           await setNotif(data)

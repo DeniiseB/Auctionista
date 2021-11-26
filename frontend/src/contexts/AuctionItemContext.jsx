@@ -10,7 +10,6 @@ export const useAuctionItem = () => {
 
 const AuctionItemProvider = (props) => {
   const [auctionItems, setAuctionItems] = useState([]);
-  const [primaryImgPath, setPrimaryImgPath] = useState("");
   const [imgPaths, setImgPaths] = useState([]);
   const [specificItem, setSpecificItem] = useState({})
 
@@ -110,7 +109,6 @@ const AuctionItemProvider = (props) => {
   const values = {
     postNewAuctionItem,
     auctionItems,
-    setPrimaryImgPath,
     setImgPaths,
     fetchAuctionItem,
     fetchItemsInBatch,

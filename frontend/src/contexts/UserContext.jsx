@@ -35,7 +35,6 @@ const UserContextProvider = (props) => {
       let fetchedUser = await res.json();
       console.log("Logged in: ", fetchedUser);
       setCurrentUser(fetchedUser);
-     // await whoAmI();
       return fetchedUser;
     } else {
       console.log("Login failed")
@@ -60,10 +59,6 @@ const UserContextProvider = (props) => {
     }
   };
 
-  const getCurrentUser = () => {
-    return currentUser;
-  };
-
   // FIX LOGOUT
   const logout = async () => {
    // let res = await fetch("/logout");
@@ -75,7 +70,6 @@ const UserContextProvider = (props) => {
     register,
     login,
     logout,
-    getCurrentUser,
     whoAmI,
     currentUser,
   };

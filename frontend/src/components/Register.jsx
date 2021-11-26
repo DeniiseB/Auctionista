@@ -31,7 +31,7 @@ export function Register(props) {
   const [errorMessage, setErrorMessage] = useState(false);
   const [successMsg] = useState(false);
   const [passwordError, setpasswordError] = useState(false);
-  const [emailIsTaken, setEmailIsTaken] = useState(false);
+  const [emailIsTaken] = useState(false);
 
   async function registerUser(e) {
     e.preventDefault();
@@ -66,15 +66,17 @@ export function Register(props) {
     const response = await register(user);
     if (response !== null) {
       console.log("User registered");
-      let loginRes = await login(userLogin);
-      if (loginRes !== null) {
-        console.log("User logged in");
-      } else {
-        console.log("Log in failed");
-      }
-    }  else {
-      console.log("Register user failed");
-    }
+      loginAfterRegister(userLogin);
+    } 
+  }
+
+  async function loginAfterRegister(userLogin) {
+    let loginRes = await login(userLogin);
+    console.log("userLogin: ", userLogin)
+    console.log("loginRes: ", loginRes)
+    if (loginRes !== null) {
+      console.log("User logged in");
+    } 
   }
 
   return (
@@ -155,7 +157,10 @@ export function Register(props) {
           {emailIsTaken && <ErrorMessage>Email is already taken</ErrorMessage>}
         </div>
         <Modal.Footer>
-          <button className="btn btn-dark btn-lg" onClick={(e) => registerUser(e)}>
+          <button
+            className="btn btn-dark btn-lg"
+            onClick={(e) => registerUser(e)}
+          >
             Register
           </button>{" "}
         </Modal.Footer>

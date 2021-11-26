@@ -9,37 +9,33 @@ import { useBidContext } from "../contexts/BidContext";
 import BootstrapModal from "./BootstrapModal";
 import { useSocketContext } from "../contexts/SocketContext";
 
-
-
 const AuctionItemCard = (props) => {
-
-   const location = useLocation(); 
+  const location = useLocation();
   const history = useHistory();
-  const { fetchAuctionItem } = useAuctionItem()
-  const [item, setItem] = useState({})
-    const { getCurrentUser } = useContext(UserContext);
-   const { postNewBid } = useBidContext();
-   const [show, setShow] = useState(false);
- 
+  const { fetchAuctionItem } = useAuctionItem();
+  const [item, setItem] = useState({});
+  const { currentUser } = useContext(UserContext);
+  const { postNewBid } = useBidContext();
+  const [show, setShow] = useState(false);
   const [modalText, setModalText] = useState("");
   const { socket } = useSocketContext();
-  
-  
-   
-  
-  useEffect( async () => {
-    let auctionItem = await fetchAuctionItem(props.props.id)
-    setItem(auctionItem);
-    onNotif()
+
+  useEffect(() => {
+    fetchAndSetAuctionItem();
   }, []);
+
+  const fetchAndSetAuctionItem = async () => {
+    let auctionItem = await fetchAuctionItem(props.props.id);
+    setItem(auctionItem);
+    onNotif();
+  };
 
   async function sendNotif() {
     console.log("sending id " + item.id);
     let toSend = {
       updateItemId: item.id,
     };
-
-    let response = await fetch("/api/bid-notifs", {
+    await fetch("/api/bid-notifs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(toSend),
@@ -47,85 +43,74 @@ const AuctionItemCard = (props) => {
   }
 
   async function sendOutbiddenNotif(newBid) {
-      if (item.bids.length > 0 &&item.bids[item.bids.length - 1].user_id !==getCurrentUser().id.toString()) {
-        let outbiddenNotif = {
-          fromLogin: getCurrentUser().username,
-          toWho: item.bids[item.bids.length - 1].user_id,
-          auctionItemid: props.props.id,
-          auctionItemTitle: props.props.title,
-          lastBidAmount: newBid,
-        };
+    if (
+      item.bids.length > 0 &&
+      item.bids[item.bids.length - 1].user_id !== currentUser.id.toString()
+    ) {
+      let outbiddenNotif = {
+        fromLogin: currentUser.username,
+        toWho: item.bids[item.bids.length - 1].user_id,
+        auctionItemid: props.props.id,
+        auctionItemTitle: props.props.title,
+        lastBidAmount: newBid,
+      };
 
-        let res = await fetch("/api/outbidden", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(outbiddenNotif),
-        });
-      } else {
-        console.log("Last bid was your own bid or you are the first bidder");
-      }
+      await fetch("/api/outbidden", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(outbiddenNotif),
+      });
+    } else {
+      console.log("Last bid was your own bid or you are the first bidder");
     }
+  }
 
   const onNotif = () => {
     socket.on("notifications", function (data) {
       console.log("new notification about updating item received");
       if (window.location.pathname === "/") {
-       
         if (props.props.id == data.updateItemId) {
-           updateItem(data.updateItemId)
+          updateItem(data.updateItemId);
         }
-       
       }
     });
   };
 
   async function updateItem(itemId) {
-    let auctionItem = await fetchAuctionItem(itemId)
+    let auctionItem = await fetchAuctionItem(itemId);
     setItem(auctionItem);
- 
   }
 
-  
+  const toggleModal = () => {
+    setShow(!show);
+  };
 
-   const toggleModal = () => {
-     setShow(!show);
-   };
-
- 
-  
   async function quickBid() {
-    
-    
-      if (!getCurrentUser()) {
-        setModalText("Please log in");
+    if (!currentUser) {
+      setModalText("Please log in");
+      toggleModal();
+    } else {
+      const bidToPost = {
+        amount: item.minimumBid,
+        time: new Date(),
+        user_id: currentUser.id,
+        auctionItem: item,
+      };
+
+      let res = await postNewBid(bidToPost);
+
+      if (!res.error) {
+        setModalText("You placed bid worth of " + bidToPost.amount + " ₿");
+        updateItem(item.id);
         toggleModal();
-      } else {
-       
-        const bidToPost = {
-          amount: item.minimumBid,
-          time: new Date(),
-          user_id: getCurrentUser().id,
-          auctionItem: item,
-        };
-
-        let res = await postNewBid(bidToPost);
-
-        if (!res.error) {
-          setModalText("You placed bid worth of " + bidToPost.amount + " ₿");
-        updateItem(item.id)
-          toggleModal();
-          sendNotif()
-          sendOutbiddenNotif(item.minimumBid)
-         
-         
-        }
-      
+        sendNotif();
+        sendOutbiddenNotif(item.minimumBid);
       }
-    
+    }
   }
-   
+
   function redirect() {
-    history.push("/details/" + props.props.id)
+    history.push("/details/" + props.props.id);
     window.scrollTo(0, 0);
   }
 
@@ -142,7 +127,8 @@ const AuctionItemCard = (props) => {
         <div>
           {item.bids && item.bids.length > 0 ? (
             <p>
-              Current price: <strong>{item.bids[item.bids.length - 1].amount}</strong>{" "}
+              Current price:{" "}
+              <strong>{item.bids[item.bids.length - 1].amount}</strong>{" "}
               <i className="bi bi-currency-bitcoin"></i>
             </p>
           ) : (
@@ -158,15 +144,13 @@ const AuctionItemCard = (props) => {
               <i className="bi bi-currency-bitcoin"></i>{" "}
             </strong>
           </p>
-          {location.pathname === "/" && getCurrentUser() && item.owner ? (
+          {location.pathname === "/" && currentUser && item.owner ? (
             <div>
               <button
                 className="quickBid"
                 style={styles.btn}
                 onClick={quickBid}
-                disabled={
-                  getCurrentUser().id === item.owner.id ? "disabled" : ""
-                }
+                disabled={currentUser.id === item.owner.id ? "disabled" : ""}
               >
                 Place quick bid
               </button>
@@ -175,7 +159,6 @@ const AuctionItemCard = (props) => {
                 modal={show}
                 text={modalText}
               />
-              
             </div>
           ) : null}
           <div style={styles.counter}>
@@ -198,9 +181,7 @@ const AuctionItemCard = (props) => {
       </div>
     </div>
   );
-
-}
-
+};
 
 export default AuctionItemCard;
 
