@@ -20,13 +20,8 @@ const SuccessMessage = styled.span`
 `;
 
 export function Register(props) {
-  function openPopup() {
-    props.func(true);
-  }
-
   const { modal, toggle } = props;
   const { register, login } = useContext(UserContext);
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmedPassword] = useState("");
@@ -34,9 +29,10 @@ export function Register(props) {
   const [email, setEmail] = useState("");
   const [emailError, setEmailError] = useState(false);
   const [errorMessage, setErrorMessage] = useState(false);
-  const [successMsg, setSuccessMsg] = useState(false);
+  const [successMsg] = useState(false);
   const [passwordError, setpasswordError] = useState(false);
   const [emailIsTaken, setEmailIsTaken] = useState(false);
+
   async function registerUser(e) {
     e.preventDefault();
     if (password === "" || confirmPassword !== password) {
@@ -68,22 +64,19 @@ export function Register(props) {
       password: password,
     };
     const response = await register(user);
-    if (response.status === 201) {
-      console.log("new user has been registered");
-
+    if (response !== null) {
+      console.log("User registered");
       let loginRes = await login(userLogin);
       if (loginRes !== null) {
-        console.log("and logged in successfully!");
+        console.log("User logged in");
       } else {
-        console.log("smth went wrong when logging in");
+        console.log("Log in failed");
       }
-    } else if (response.status === 400) {
-      console.log("this email is already taken");
-      setEmailIsTaken(true);
-    } else {
-      console.log("Smth went wrong when registering new user");
+    }  else {
+      console.log("Register user failed");
     }
   }
+
   return (
     <div>
       <Modal show={modal} onHide={toggle}>

@@ -9,7 +9,6 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "users")
@@ -27,14 +26,8 @@ public class User {
 
     @Column(unique=true)
     private String username;
+
     private String email;
-
-    @JsonIgnore
-    @JsonProperty(value = "password")
-    public String getPassword() {
-        return password;
-    }
-
     private String password;
 
     @OneToMany(mappedBy="owner")
@@ -53,20 +46,16 @@ public class User {
     )
     private List<ChatRoom> chatrooms;
 
-    public AuthProvider getProvider() {
-        return provider;
+    @JsonIgnore
+    @JsonProperty(value = "password")
+    public String getPassword() {
+        return password;
     }
 
-    public void setProvider(AuthProvider provider) {
-        this.provider = provider;
-    }
-
-    public String getProviderId() {
-        return providerId;
-    }
-
-    public void setProviderId(String providerId) {
-        this.providerId = providerId;
+    // enable password from frontend when logging in
+    @JsonProperty
+    public void setPassword(String password) {
+        this.password = password;
     }
 
     public void updateChatrooms(ChatRoom chatRoom) {

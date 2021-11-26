@@ -4,7 +4,6 @@ import com.example.demo.configs.MyUserDetailsService;
 import com.example.demo.entities.User;
 import com.example.demo.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -12,8 +11,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-
-import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -50,31 +47,10 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public ResponseEntity<User> createUser(User user) {
+    public User createUser(User user) {
         // user userDetailsService to save new user
         // because we encrypt the password here
-        List<User> users=getAllUsers();
-        boolean usernameIsUsed=false;
-
-
-        for(User myUser : users){
-
-
-            String username= myUser.getUsername();
-
-            if(username.equals(user.getUsername())){
-                usernameIsUsed=true;
-                return ResponseEntity.badRequest().build();
-            }
-
-
-        }
-        if(!usernameIsUsed){
-            myUserDetailsService.addUser(user);
-            return ResponseEntity.ok(user);
-        }
-
-        return null;
+        return myUserDetailsService.addUser(user);
     }
 
     public User login(User user, HttpServletRequest req) {

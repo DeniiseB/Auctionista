@@ -20,18 +20,13 @@ const SuccessMessage = styled.span`
 `
 
 export function Login(props) {
-  const {
-    modal, toggle
-  } = props;
-  const { login, whoAmI} = useContext(UserContext)
-
-
-  const [email, setEmail] = useState('')
+  const { modal, toggle } = props;
+  const { login } = useContext(UserContext)
+  const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [errorMessage, setErrorMessage] = useState(false)
-  const [successMsg, setSuccessMsg] = useState(false)
-   const targetUri = "http://localhost:3000/oauth2/redirect";
-   const baseUri = "http://localhost:4000";
+  const [successMsg] = useState(false)
+
 
    function openPopup() {
      props.func(true);
@@ -42,20 +37,18 @@ export function Login(props) {
     e.preventDefault()
     setErrorMessage(false)
     let user = {
-      email: email,
+      username: username,
       password: password
     }
     const response = await login(user)
-    
     if (response !== null) {
-      console.log("login successfull with token!");
       openPopup();
     } else {
-      console.log("smth went wrong when trying to login");
+      console.log("Login failed");
     }
-
-  
   }
+
+
   return (
     <div>
       <Modal show={modal} onHide={toggle}>
@@ -69,9 +62,9 @@ export function Login(props) {
                 aria-describedby="inputGroup-sizing-default"
                 required
                 type="text"
-                placeholder="Email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Username"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
               />
             </InputGroup>
           </div>
@@ -97,39 +90,6 @@ export function Login(props) {
               Login
             </button>{" "}
             <div className="social" style={styles.social}>
-              
-              <div className="socialLogos" style={styles.logos}>
-                <a
-                  href={
-                    baseUri +
-                    "/oauth2/authorize/google?redirect_uri=" +
-                    targetUri
-                  }
-                  style={styles.socialLogos}
-                >
-                  <img
-                    src="https://www.freepnglogos.com/uploads/google-logo-png/google-logo-png-suite-everything-you-need-know-about-google-newest-0.png"
-                    alt=""
-                    className="socialLogin google"
-                    style={styles.socialLogin}
-                  />
-                </a>
-                <a
-                  href={
-                    baseUri +
-                    "/oauth2/authorize/facebook?redirect_uri=" +
-                    targetUri
-                  }
-                  style={styles.socialLogos}
-                >
-                  <img
-                    src="https://www.freepnglogos.com/uploads/facebook-logo-png-6.png"
-                    alt=""
-                    className="socialLogin facebook"
-                    style={styles.socialLogin}
-                  />
-                </a>
-              </div>
             </div>
           </div>
         </Modal.Footer>

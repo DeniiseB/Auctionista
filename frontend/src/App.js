@@ -12,7 +12,6 @@ import BidProvider from "./contexts/BidContext";
 import MyListings from "./pages/MyListings";
 import MyMessages from "./pages/MyMessages";
 import MyProfile from "./pages/MyProfile";
-import OAuth2RedirectHandler from "./components/OAuth2RedirectHandler";
 import MessageContextProvider from "./contexts/MessageContext";
 import Notifications from "./components/Notifications";
 import OutbiddenNotif from "./components/OutbiddenNotif";
@@ -51,10 +50,6 @@ function App() {
                         path="/my-messages/:roomid"
                         component={MyMessages}
                       />
-                      <Route
-                        path="/oauth2/redirect"
-                        component={OAuth2RedirectHandler}
-                      ></Route>
                     </Switch>
                   </main>
                   <footer>
