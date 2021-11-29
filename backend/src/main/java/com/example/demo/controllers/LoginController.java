@@ -7,12 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api")
 public class LoginController {
 
-    // ADD USER EXISTS CHECKS, E-MAIL SIGN UP, LOGOUT
+    // ADD USER EXISTS CHECKS, E-MAIL LOGIN
 
     @Autowired
     private UserService userService;
@@ -27,6 +28,13 @@ public class LoginController {
         return ResponseEntity.notFound().build();
         }
     }
+
+    @GetMapping("/logout")
+    public void logout(HttpServletRequest req, HttpServletResponse res) {
+        userService.logout(req, res);
+    }
+
+
 
     @PostMapping("/register")
     public ResponseEntity<User> register(@RequestBody User user) {
