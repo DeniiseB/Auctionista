@@ -49,10 +49,21 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User createUser(User user) {
+    public User createUser(User user, HttpServletRequest req) {
+        try {
+        // Creating an instance of user before password get encrypted
+        User userForLogin = User.builder().username(user.getUsername()).password(user.getPassword()).build();
         // user userDetailsService to save new user
         // because we encrypt the password here
-        return myUserDetailsService.addUser(user);
+        User newUser = myUserDetailsService.addUser(user);
+        if(newUser != null) {
+            login(userForLogin, req);
+        }
+        return newUser;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public User login(User user, HttpServletRequest req) {
@@ -78,7 +89,7 @@ public class UserService {
         return findCurrentUser();
     }
 
-    public void logout (HttpServletRequest req, HttpServletResponse res) {
+    public Boolean logout (HttpServletRequest req, HttpServletResponse res) {
         try {
             SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
 
@@ -86,9 +97,14 @@ public class UserService {
 
             if (authentication != null) {
                 logoutHandler.logout(req, res, authentication);
+                return true;
+            }
+            else {
+                return false;
             }
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
 
     }

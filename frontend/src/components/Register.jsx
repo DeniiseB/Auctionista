@@ -21,7 +21,7 @@ const SuccessMessage = styled.span`
 
 export function Register(props) {
   const { modal, toggle } = props;
-  const { register, login } = useContext(UserContext);
+  const { register, whoAmI } = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmedPassword] = useState("");
@@ -59,23 +59,12 @@ export function Register(props) {
       fullName: fullName,
       email: email,
     };
-    let userLogin = {
-      email: email,
-      password: password,
-    };
+
     const response = await register(user);
     if (response !== null) {
       console.log("User registered");
-      loginAfterRegister(userLogin);
-    } 
-  }
-
-  async function loginAfterRegister(userLogin) {
-    let loginRes = await login(userLogin);
-    console.log("userLogin: ", userLogin)
-    console.log("loginRes: ", loginRes)
-    if (loginRes !== null) {
-      console.log("User logged in");
+      whoAmI();
+      toggle();
     } 
   }
 

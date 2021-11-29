@@ -31,6 +31,7 @@ const UserContextProvider = (props) => {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(user),
     });
+    console.log(res)
     if (res.status == 200) {
       let fetchedUser = await res.json();
       console.log("Logged in: ", fetchedUser);

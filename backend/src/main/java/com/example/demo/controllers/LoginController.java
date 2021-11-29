@@ -30,15 +30,22 @@ public class LoginController {
     }
 
     @GetMapping("/logout")
-    public void logout(HttpServletRequest req, HttpServletResponse res) {
-        userService.logout(req, res);
+    public ResponseEntity<Boolean> logout(HttpServletRequest req, HttpServletResponse res) {
+        Boolean loggedOut = userService.logout(req, res);
+
+        if(loggedOut) {
+            return ResponseEntity.ok(true);
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
     }
 
 
 
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        User userFromService = userService.createUser(user);
+    public ResponseEntity<User> register(@RequestBody User user, HttpServletRequest req) {
+        User userFromService = userService.createUser(user, req);
         if(userFromService != null) {
             return ResponseEntity.ok(userFromService);
         }
