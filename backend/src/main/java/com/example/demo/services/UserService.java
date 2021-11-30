@@ -10,9 +10,11 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Optional;
@@ -47,10 +49,21 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public User createUser(User user) {
+    public User createUser(User user, HttpServletRequest req) {
+        try {
+        // Creating an instance of user before password get encrypted
+        User userForLogin = User.builder().username(user.getUsername()).password(user.getPassword()).build();
         // user userDetailsService to save new user
         // because we encrypt the password here
-        return myUserDetailsService.addUser(user);
+        User newUser = myUserDetailsService.addUser(user);
+        if(newUser != null) {
+            login(userForLogin, req);
+        }
+        return newUser;
+        }catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public User login(User user, HttpServletRequest req) {
@@ -74,5 +87,25 @@ public class UserService {
         }
 
         return findCurrentUser();
+    }
+
+    public Boolean logout (HttpServletRequest req, HttpServletResponse res) {
+        try {
+            SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
+
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+
+            if (authentication != null) {
+                logoutHandler.logout(req, res, authentication);
+                return true;
+            }
+            else {
+                return false;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+
     }
 }

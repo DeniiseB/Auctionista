@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { useMessage } from "../contexts/MessageContext";
-import {UserContext} from "../contexts/UserContext"
 import io from "socket.io-client";
 
 const socket1 = io("http://localhost:9092");
@@ -11,7 +10,7 @@ export const useSocketContext = () => {
 };
 
 const SocketProvider = (props) => {
-  const [socket, setSocket] = useState(socket1);
+  const [socket] = useState(socket1);
   const { setChatRoom, getRoomById } = useMessage();
   const [isConnected, setIsConnected] = useState(false);
 

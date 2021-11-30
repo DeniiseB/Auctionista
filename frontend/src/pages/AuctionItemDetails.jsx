@@ -45,7 +45,7 @@ function AuctionItemDetails() {
       updateItemId: specificItem.id,
     };
 
-    let response = await fetch("/api/bid-notifs", {
+   await fetch("/api/bid-notifs", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(toSend),
@@ -66,7 +66,7 @@ function AuctionItemDetails() {
         lastBidAmount: newBid,
       };
 
-      let res = await fetch("/api/outbidden", {
+      await fetch("/api/outbidden", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(outbiddenNotif),

@@ -7,12 +7,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api")
 public class LoginController {
 
-    // ADD USER EXISTS CHECKS, E-MAIL SIGN UP, LOGOUT
+    // ADD USER EXISTS CHECKS, E-MAIL LOGIN
 
     @Autowired
     private UserService userService;
@@ -28,9 +29,23 @@ public class LoginController {
         }
     }
 
+    @GetMapping("/logout")
+    public ResponseEntity<Boolean> logout(HttpServletRequest req, HttpServletResponse res) {
+        Boolean loggedOut = userService.logout(req, res);
+
+        if(loggedOut) {
+            return ResponseEntity.ok(true);
+        }
+        else {
+            return ResponseEntity.badRequest().build();
+        }
+    }
+
+
+
     @PostMapping("/register")
-    public ResponseEntity<User> register(@RequestBody User user) {
-        User userFromService = userService.createUser(user);
+    public ResponseEntity<User> register(@RequestBody User user, HttpServletRequest req) {
+        User userFromService = userService.createUser(user, req);
         if(userFromService != null) {
             return ResponseEntity.ok(userFromService);
         }

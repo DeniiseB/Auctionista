@@ -1,11 +1,9 @@
 import React, { useState } from "react";
-import { useAuctionItem } from "../contexts/AuctionItemContext";
 import BootstrapModal from "./BootstrapModal";
 
 function FileUpload(props) {
   const [imgPaths, setImgPaths] = useState([]);
   const [primaryImgIndex, setPrimaryImgIndex] = useState(0);
-  const { setPrimaryImgPath } = useAuctionItem();
   const [show, setShow] = useState(false);
   const [modalText, setModalText] = useState("");
   props.func(imgPaths, primaryImgIndex);
@@ -53,7 +51,6 @@ function FileUpload(props) {
     let choosenImg = e.target.src.split("3000")[1];
     let indexOfChoosenImg = imgPaths.indexOf(choosenImg);
     setPrimaryImgIndex(indexOfChoosenImg);
-    setPrimaryImgPath(choosenImg);
   }
 
   return (

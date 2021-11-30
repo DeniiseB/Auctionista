@@ -20,20 +20,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
         http
                 .csrf().disable()
                 .authorizeRequests()
-                .antMatchers(HttpMethod.POST, "/api/**").permitAll()
-                .antMatchers(HttpMethod.POST,"/api/newLogin").permitAll()
-                .antMatchers("/auth/**", "/oauth2/**", "/login/**")
-                .permitAll()
-                .antMatchers("/chat/**").permitAll()
-                .antMatchers(HttpMethod.POST,"/rest/bids").authenticated()
-                //.antMatchers(HttpMethod.GET,"/api/whoami").authenticated()
-                .antMatchers(HttpMethod.POST,"/rest/auctionItems").authenticated()
-                .antMatchers(HttpMethod.GET,"/rest/bids").permitAll()
                 .antMatchers(HttpMethod.GET, "/", "/rest/**").permitAll()
-                .antMatchers(HttpMethod.GET, "/login").permitAll()
-                .antMatchers("/api/relist/**").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/**").permitAll()
+                .antMatchers(HttpMethod.POST,"/login").permitAll()
+                .antMatchers(HttpMethod.POST,"/register").permitAll()
+                .antMatchers(HttpMethod.GET,"/logout").authenticated()
                 .antMatchers("/auth/**").permitAll()
-                .antMatchers("/rest/**").authenticated();
+                .antMatchers("/rest/**").authenticated()
+                .antMatchers("/chat/**").authenticated()
+                .antMatchers(HttpMethod.POST,"/rest/bids").authenticated()
+                .antMatchers("/api/relist/**").authenticated();
+                //.antMatchers(HttpMethod.GET,"/api/whoami").authenticated()
+//                .antMatchers(HttpMethod.POST,"/rest/auctionItems").authenticated()
+//                .antMatchers(HttpMethod.GET,"/rest/bids").permitAll()
+
     }
 
 

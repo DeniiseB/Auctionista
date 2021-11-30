@@ -21,7 +21,7 @@ const SuccessMessage = styled.span`
 
 export function Register(props) {
   const { modal, toggle } = props;
-  const { register, login } = useContext(UserContext);
+  const { register, whoAmI } = useContext(UserContext);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmedPassword] = useState("");
@@ -31,7 +31,7 @@ export function Register(props) {
   const [errorMessage, setErrorMessage] = useState(false);
   const [successMsg] = useState(false);
   const [passwordError, setpasswordError] = useState(false);
-  const [emailIsTaken, setEmailIsTaken] = useState(false);
+  const [emailIsTaken] = useState(false);
 
   async function registerUser(e) {
     e.preventDefault();
@@ -59,22 +59,13 @@ export function Register(props) {
       fullName: fullName,
       email: email,
     };
-    let userLogin = {
-      email: email,
-      password: password,
-    };
+
     const response = await register(user);
     if (response !== null) {
       console.log("User registered");
-      let loginRes = await login(userLogin);
-      if (loginRes !== null) {
-        console.log("User logged in");
-      } else {
-        console.log("Log in failed");
-      }
-    }  else {
-      console.log("Register user failed");
-    }
+      whoAmI();
+      toggle();
+    } 
   }
 
   return (
@@ -155,7 +146,10 @@ export function Register(props) {
           {emailIsTaken && <ErrorMessage>Email is already taken</ErrorMessage>}
         </div>
         <Modal.Footer>
-          <button className="btn btn-dark btn-lg" onClick={(e) => registerUser(e)}>
+          <button
+            className="btn btn-dark btn-lg"
+            onClick={(e) => registerUser(e)}
+          >
             Register
           </button>{" "}
         </Modal.Footer>

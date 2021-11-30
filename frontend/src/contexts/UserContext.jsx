@@ -20,7 +20,7 @@ const UserContextProvider = (props) => {
       let fetchedUser = await res.json();
       return fetchedUser;
     } else {
-      console.log("Register failed")
+      console.log("Register failed");
       return null;
     }
   };
@@ -31,15 +31,25 @@ const UserContextProvider = (props) => {
       headers: { "content-type": "application/json" },
       body: JSON.stringify(user),
     });
+    console.log(res)
     if (res.status == 200) {
       let fetchedUser = await res.json();
       console.log("Logged in: ", fetchedUser);
       setCurrentUser(fetchedUser);
-     // await whoAmI();
       return fetchedUser;
     } else {
-      console.log("Login failed")
+      console.log("Login failed");
       return null;
+    }
+  };
+
+  const logout = async () => {
+    try {
+      await fetch("/logout");
+      setCurrentUser(null);
+      console.log("User logged out")
+    } catch {
+      console.log("Logout failed");
     }
   };
 
@@ -49,33 +59,21 @@ const UserContextProvider = (props) => {
       if (res.status == 200) {
         let fetchedUser = await res.json();
         setCurrentUser(fetchedUser);
-        console.log("I am: ", fetchedUser)
-      }
-      else {
+        console.log("I am: ", fetchedUser);
+      } else {
+        console.log("Current user not found");
         setCurrentUser(null);
         return null;
       }
     } catch {
-      console.log("Current user not found");
+      console.log("Something went wrong");
     }
-  };
-
-  const getCurrentUser = () => {
-    return currentUser;
-  };
-
-  // FIX LOGOUT
-  const logout = async () => {
-   // let res = await fetch("/logout");
-    setCurrentUser(null);
-    console.log("You have not been logged out because it doenst work");
   };
 
   const values = {
     register,
     login,
     logout,
-    getCurrentUser,
     whoAmI,
     currentUser,
   };
