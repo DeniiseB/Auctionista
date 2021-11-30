@@ -16,6 +16,8 @@ function CreateNewListing() {
   const [imgString, setImgString] = useState("");
   const [indexOfPrimaryImg, setIndexOfPrimaryImg] = useState(0);
   const [myProp, setMyProp] = useState({});
+  const [formData, setFormData] = useState();
+  const [imgPaths, setImgPaths] = useState();
 
   function isNumber(n) {
     return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
@@ -37,15 +39,31 @@ function CreateNewListing() {
     }
   };
 
-  const getChildData = (imgPaths, indexOfPrimaryImg) => {
-    setIndexOfPrimaryImg(indexOfPrimaryImg);
-    let arrayOfStrings = [];
-    for (let path of imgPaths) {
-      let pathToSave = path;
-      arrayOfStrings.push(pathToSave);
-    }
-    setImgString(arrayOfStrings.toString());
+  const getChildData = (formDataFromChild, primaryIndex) => {
+    setIndexOfPrimaryImg(primaryIndex);
+    setFormData(formDataFromChild);
   };
+
+  async function postImages(formDataFromChild) {
+    let res = await fetch("/api/upload", {
+      method: "POST",
+      body: formDataFromChild,
+    });
+    if (res.status === 200) {
+      let filePaths = await res.json();
+      setImgPaths(filePaths);
+      let arrayOfImgStrings = [];
+      for (let path of filePaths) {
+        let pathToSave = path;
+        arrayOfImgStrings.push(pathToSave);
+      }
+      setImgString(arrayOfImgStrings.toString());
+      return true;
+    } else {
+      console.log("Image upload failed");
+      return false;
+    }
+  }
 
   async function postNewItem() {
     if (
@@ -60,40 +78,47 @@ function CreateNewListing() {
     ) {
       setMyProp({ show: true, text: "Invalid data, please try again" });
     } else {
-      const itemToPost = {
-        title: title,
-        description: description,
-        reservationPrice: reservationPrice,
-        startPrice: startPrice,
-        deadline: addDays(new Date(), 3),
-        images: imgString,
-        primaryImgIndex: indexOfPrimaryImg,
-        notificationSeen: false,
-        sold: false,
-        minimumBid: Math.round((110 / 100) * startPrice),
-        owner: {
-          id: currentUser.id,
-          fullName: currentUser.fullName,
-          username: currentUser.username,
-          email: currentUser.email,
-        },
-      };
+      if (postImages(formData)) {
+        const itemToPost = {
+          title: title,
+          description: description,
+          reservationPrice: reservationPrice,
+          startPrice: startPrice,
+          deadline: addDays(new Date(), 3),
+          images: imgString,
+          primaryImgIndex: indexOfPrimaryImg,
+          notificationSeen: false,
+          sold: false,
+          minimumBid: Math.round((110 / 100) * startPrice),
+          owner: {
+            id: currentUser.id,
+            fullName: currentUser.fullName,
+            username: currentUser.username,
+            email: currentUser.email,
+          },
+        };
 
-      let res = await postNewAuctionItem(itemToPost);
+        let res = await postNewAuctionItem(itemToPost);
 
-      if (res.status === 200) {
-        setTitle("");
-        setDescription("");
-        setReservationPrice(0);
-        setStartPrice(0);
+        if (res.status === 200) {
+          setTitle("");
+          setDescription("");
+          setReservationPrice(0);
+          setStartPrice(0);
 
-        setMyProp({
-          show: true,
-          colour: "green",
-          text: "Your item has been published",
-          footerText:
-            "Our little team of developer chickens is grateful for using our website 🎉",
-        });
+          setMyProp({
+            show: true,
+            colour: "green",
+            text: "Your item has been published",
+            footerText:
+              "Our little team of developer chickens is grateful for using our website 🎉",
+          });
+        } else {
+          setMyProp({
+            show: true,
+            text: "Something went wrong, try again later",
+          });
+        }
       } else {
         setMyProp({
           show: true,
@@ -142,8 +167,7 @@ function CreateNewListing() {
           </div>
 
           <div style={styles.inputInside} className="inputInside">
-            <label htmlFor="">Upload images and choose primary picture</label>
-
+            <label htmlFor="">Upload images and choose thumbnail</label>
             <FileUpload func={getChildData} />
           </div>
           <div style={styles.inputInside} className="inputInside">
@@ -198,9 +222,9 @@ const styles = {
   },
   coolImg: {
     width: "100%",
-    height: "980px",
+    height: "100%",
+    objectFit: "cover",
   },
-
   textInImg: {
     textAlign: "left",
     position: "absolute",
@@ -215,12 +239,11 @@ const styles = {
     display: "flex",
     flexDirection: "column",
     padding: "2vh 5vw 2vh 5vw",
-    gap: "15vh",
+    gap: "5vh",
   },
   inputs: {
     backgroundColor: "rgb(226, 89, 55)",
     borderRaidus: "30%",
-
     display: "flex",
     flexDirection: "column",
     alignItems: "center",
