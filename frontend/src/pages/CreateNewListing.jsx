@@ -1,23 +1,22 @@
 import { useState, useContext } from "react";
+import { useHistory } from "react-router-dom";
 import FileUpload from "../components/FileUpload";
 import { useAuctionItem } from "../contexts/AuctionItemContext";
 import TooltipHelp from "../components/TooltipHelp";
 import { UserContext } from "../contexts/UserContext";
-
 import CustomModal from "../components/CustomModal";
 
 function CreateNewListing() {
+  const history = useHistory();
   const { postNewAuctionItem } = useAuctionItem();
   const { currentUser } = useContext(UserContext);
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [reservationPrice, setReservationPrice] = useState(0);
   const [startPrice, setStartPrice] = useState(0);
-  const [imgString, setImgString] = useState("");
   const [indexOfPrimaryImg, setIndexOfPrimaryImg] = useState(0);
   const [myProp, setMyProp] = useState({});
   const [formData, setFormData] = useState();
-  const [imgPaths, setImgPaths] = useState();
 
   function isNumber(n) {
     return /^-?[\d.]+(?:e-?\d+)?$/.test(n);
@@ -31,11 +30,11 @@ function CreateNewListing() {
   }
 
   const pull_data = (data) => {
-    console.log(data);
-    if (data === false) {
-      setMyProp({
-        show: false,
-      });
+    setMyProp({
+      show: false,
+    });
+    if (data === "/my-listings") {
+      history.push("/my-listings");
     }
   };
 
@@ -51,17 +50,15 @@ function CreateNewListing() {
     });
     if (res.status === 200) {
       let filePaths = await res.json();
-      setImgPaths(filePaths);
       let arrayOfImgStrings = [];
       for (let path of filePaths) {
         let pathToSave = path;
         arrayOfImgStrings.push(pathToSave);
       }
-      setImgString(arrayOfImgStrings.toString());
-      return true;
+      return arrayOfImgStrings.toString();
     } else {
       console.log("Image upload failed");
-      return false;
+      return null;
     }
   }
 
@@ -72,20 +69,20 @@ function CreateNewListing() {
       title === "" ||
       description === "" ||
       !reservationPrice > 0 ||
-      imgString.split(",")[0] === "" ||
       reservationPrice < 0 ||
       startPrice < 0
     ) {
-      setMyProp({ show: true, text: "Invalid data, please try again" });
+      setMyProp({ show: true, text: "Please enter correct information" });
     } else {
-      if (postImages(formData)) {
+      let imageString = await postImages(formData);
+      if (imageString !== null) {
         const itemToPost = {
           title: title,
           description: description,
           reservationPrice: reservationPrice,
           startPrice: startPrice,
           deadline: addDays(new Date(), 3),
-          images: imgString,
+          images: imageString,
           primaryImgIndex: indexOfPrimaryImg,
           notificationSeen: false,
           sold: false,
@@ -101,17 +98,10 @@ function CreateNewListing() {
         let res = await postNewAuctionItem(itemToPost);
 
         if (res.status === 200) {
-          setTitle("");
-          setDescription("");
-          setReservationPrice(0);
-          setStartPrice(0);
-
           setMyProp({
             show: true,
             colour: "green",
-            text: "Your item has been published",
-            footerText:
-              "Our little team of developer chickens is grateful for using our website 🎉",
+            text: "Your item has been published!",
           });
         } else {
           setMyProp({

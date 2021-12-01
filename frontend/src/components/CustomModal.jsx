@@ -19,8 +19,10 @@ const CustomModal = (prop) => {
   function close() {
     if (prop.prop.auctionItem) {
       prop.func(prop.prop.auctionItem);
+    } else if (prop.prop.text === "Your item has been published!") {
+      prop.func("/my-listings");
     } else {
-      prop.func(false)
+      prop.func(false);
     }
   }
 
@@ -117,6 +119,7 @@ const styles = {
     textAlign: "right",
     cursor: "pointer",
     paddingRight: "1rem",
+    zIndex: "100"
     
   },
   modalFooter: {

@@ -4,62 +4,75 @@ import BootstrapModal from "./BootstrapModal";
 function FileUpload(props) {
   const [show, setShow] = useState(false);
   const [modalText, setModalText] = useState("");
-  const [imgPaths, setImgPaths] = useState([]);
+  const [imgURLs, setImgURLs] = useState([]);
   const [indexOfPrimaryImg, setIndexOfPrimaryImg] = useState(0);
+  const [selectedFiles, setSelectedFiles] = useState([]);
 
   const toggleModal = () => {
     setShow(!show);
   };
 
   async function onFileLoad(e) {
-    let tempImgURLArray = [];
     let files = e.target.files;
+    let tempArray = []
     let filesSize = 0;
+
+    for (let file of files) {
+      filesSize += file.size;
+      tempArray.push(file)
+    }
+    setSelectedFiles(tempArray);
 
     if (files.length > 3) {
       setModalText("Max 3 images please");
       toggleModal();
       e.target.value = null;
+    } else if (filesSize > 1040000) {
+      setModalText("Files too large");
+      toggleModal();
+      e.target.value = null;
     } else {
-      let formData = new FormData();
-
-      for (let file of files) {
-        let fileUrl = URL.createObjectURL(file);
-        tempImgURLArray.push(fileUrl);
-        filesSize += file.size;
-        formData.append("files", file, file.name);
-      }
-      if (filesSize > 1040000) {
-        setModalText("Files too large");
-        setImgPaths([]);
-        toggleModal();
-        e.target.value = null;
-      } else {
-        setImgPaths(tempImgURLArray);
-        props.func(formData, indexOfPrimaryImg);
-      }
+      createFormDataAndURLs(files);
       e.target.value = null;
     }
   }
 
-  function deleteImage() {
-    console.log("Deleting image")
+  function createFormDataAndURLs(files) {
+    let tempImgURLArray = [];
+    let formData = new FormData();
 
-    // ******* WORK FROM HERE
+    for (let file of files) {
+      let fileUrl = URL.createObjectURL(file);
+      tempImgURLArray.push(fileUrl);
+      formData.append("files", file, file.name);
+    }
+    setImgURLs(tempImgURLArray);
+    props.func(formData, indexOfPrimaryImg);
+  }
+
+  function deleteImage(index) { 
+    selectedFiles.splice(index, 1);
+    let newArray2 = [];
+    for (let file of selectedFiles) {
+      newArray2.push(file);
+    }
+    createFormDataAndURLs(newArray2);
   }
 
   return (
     <div>
       <input type="file" accept="image/*" multiple onChange={onFileLoad} />
       <div className="renderedImgs" style={styles.renderedImgs}>
-        {imgPaths && imgPaths.length > 0
-          ? imgPaths.map((img, i) => (
+        {imgURLs && imgURLs.length > 0
+          ? imgURLs.map((img, i) => (
               <div>
                 <div>
                   <i
                     className="bi bi-x-square"
                     style={styles.deleteImg}
-                    onClick={deleteImage}
+                    onClick={() => {
+                      deleteImage(i);
+                    }}
                   ></i>
                 </div>
                 <img
@@ -70,7 +83,7 @@ function FileUpload(props) {
                     setIndexOfPrimaryImg(i);
                   }}
                   style={
-                    indexOfPrimaryImg === imgPaths.indexOf(img)
+                    indexOfPrimaryImg === imgURLs.indexOf(img)
                       ? styles.primaryImg
                       : styles.img
                   }
@@ -103,7 +116,7 @@ const styles = {
     gap: "1vw",
     paddingTop: "2vh",
     width: "max-content",
-    marginRight: "3rem"
+    marginRight: "3rem",
   },
   primaryImg: {
     boxShadow: "0px 0px 8px 2px",
@@ -118,6 +131,6 @@ const styles = {
     cursor: "pointer",
     margin: "0.5rem",
     zIndex: "10",
-    position: "absolute"
+    position: "absolute",
   },
 };

@@ -16,7 +16,6 @@ function MyListings() {
   const fetchAndSetListings = async () => {
     let response = await fetchMyListings(currentUser.id, 2, 2);
     setMyListings(response);
-    console.log(response);
   };
 
   async function relistAuction(e, itemId) {
@@ -25,10 +24,11 @@ function MyListings() {
     let response = await fetchMyListings(currentUser.id, 2, 2);
     setMyListings(response);
   }
+
   return (
     <>
       <div className="pageWrapper" style={styles.pageWrapper}>
-        <h4>My current listings</h4>
+        <h4>My listings</h4>
         <div className="itemsWrapper" style={styles.itemWrapper}>
           {currentUser && myListings && myListings.length > 0 ? (
             myListings.map((item) => (
@@ -36,7 +36,7 @@ function MyListings() {
                 <AuctionItemCard props={item} />
                 {item.expired ? (
                   <div className="relistWrapper" style={styles.relistWrapper}>
-                    <p>This item has been expired</p>
+                    <p>This item has expired</p>
                     <button
                       className="relistBtn"
                       style={styles.relistBtn}
@@ -49,7 +49,7 @@ function MyListings() {
               </div>
             ))
           ) : (
-            <p>There are no auctions at this moment :,(</p>
+            <p>You don't currently have any listings</p>
           )}
         </div>
       </div>
