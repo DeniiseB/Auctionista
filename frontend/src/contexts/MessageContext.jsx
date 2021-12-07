@@ -10,7 +10,6 @@ export const useMessage = () => {
 const MessageProvider = (props) => {
   const [messages, setMessages] = useState([]);
   const [chatRoom, setChatRoom] = useState("");
-  const [chatRooms, setChatRooms] = useState([]);
 
   const createNewRoom = async (roomInfo) => {
     try {
@@ -48,8 +47,6 @@ const MessageProvider = (props) => {
     setMessages,
     chatRoom,
     setChatRoom,
-    chatRooms,
-    setChatRooms,
     getRoomById,
     createNewRoom
   };

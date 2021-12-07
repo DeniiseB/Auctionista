@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useRef } from "react";
 import { useHistory, useParams } from "react-router-dom";
 import {
   MainContainer,
@@ -14,17 +14,13 @@ import { useSocketContext } from "../contexts/SocketContext";
 function MyMessages() {
   const history = useHistory();
   const { roomid } = useParams();
-  const { chatRoom, messages, setMessages, getRoomById, setChatRooms } =
-    useMessage();
+  const { chatRoom, messages, setMessages, getRoomById } = useMessage();
   const [msgToSend, setMsgToSend] = useState("");
-  const { currentUser, whoAmI } = useContext(UserContext);
+  const { currentUser } = useContext(UserContext);
   const [otherUserName, setOtherUserName] = useState("");
   const { socket } = useSocketContext();
   const [newMessage, setNewMessage] = useState({});
-
-  useEffect(() => {
-    getUserChatRooms();
-  }, []);
+  const messagesEndRef = useRef(null);
 
   useEffect(() => {
     if (roomid) {
@@ -33,15 +29,23 @@ function MyMessages() {
       return () => {
         socket.emit("leave", "" + roomid);
       };
+    } else {
+      console.log("No room id!");
     }
   }, [roomid, newMessage]);
 
   useEffect(() => {
+    scrollToBottom();
     onChat();
     return () => {
       socket.off("chat");
     };
   }, [messages]);
+
+
+    const scrollToBottom = () => {
+      messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    };
 
   const onChat = () => {
     socket.on("chat", function (data) {
@@ -52,12 +56,6 @@ function MyMessages() {
       };
       setMessages([...messages, tempObject]);
     });
-  };
-  const getUserChatRooms = async () => {
-    let user = await whoAmI();
-    if (user && user.chatrooms.length) {
-      setChatRooms(user.chatrooms);
-    }
   };
 
   const joinRoomFromParams = async (id) => {
@@ -87,6 +85,8 @@ function MyMessages() {
           return user.username;
         }
       }
+    } else {
+      return null;
     }
   };
 
@@ -130,23 +130,26 @@ function MyMessages() {
             />
           </div>
 
-          <div style={{ position: "relative", height: "500px" }}>
+          <div style={cosStyles.messageBox}>
             <>
               <MainContainer>
                 <ChatContainer>
                   <MessageList>
-                    {messages &&
-                      messages.length > 0 &&
-                      messages.map((msg, i) => (
-                        <>
-                          <ChatMessage
-                            key={i}
-                            message={msg}
-                            sendTo={chatRoom}
-                            otherUser={otherUserName}
-                          />
-                        </>
-                      ))}
+                    {roomid && messages && messages.length > 0 && (
+                      <>
+                        {messages.map((msg, i) => (
+                          <>
+                            <ChatMessage
+                              key={i}
+                              message={msg}
+                              sendTo={chatRoom}
+                              otherUser={otherUserName}
+                            />
+                          </>
+                        ))}
+                        <div ref={messagesEndRef} />
+                      </>
+                    )}
                     {!roomid && (
                       <div
                         className="selectRoomContainer"
@@ -162,8 +165,8 @@ function MyMessages() {
                 </ChatContainer>
               </MainContainer>
 
-              {chatRoom && (
-                <div style={cosStyles.inputWrapper} className="chatWrapper">
+              {roomid && chatRoom && (
+                <div style={cosStyles.inputWrapper}>
                   <form
                     action=""
                     onSubmit={handleSubmit}
@@ -182,9 +185,11 @@ function MyMessages() {
                   </form>
                 </div>
               )}
-              {!chatRoom && roomid && <div>
-                <p>Waiting to join chatroom (try page reload...)</p>
-              </div> }
+              {!chatRoom && roomid && (
+                <div>
+                  <p>Waiting to join chatroom (try page reload...)</p>
+                </div>
+              )}
             </>
           </div>
         </>
@@ -207,10 +212,17 @@ const cosStyles = {
     padding: "5vh 3vw 5vh 1vw",
     gap: "1vw",
     height: "100vh",
+    backgroundColor: "#2d2319",
+  },
+  messageBox: {
+    position: "relative",
+    height: "500px",
+    backgroundColor: "#fffffff7",
+    borderRadius: "10px",
   },
   people: {
     width: "100%",
-    backgroundColor: "#c6e3fa",
+    backgroundColor: "#fffffff7",
     borderRadius: "10px",
     height: "87%",
     padding: "2vw 2vw 2vw 2vw",
@@ -220,8 +232,8 @@ const cosStyles = {
     width: "100%",
     height: "10vh",
     borderRadius: "10px",
-    border: "1px solid lightGrey",
-    marginTop: "3vh",
+    border: "4px solid #2d2319",
+    backgroundColor: "#fffffff7",
     display: "grid",
     gridTemplateColumns: "90% 10%",
     alignItems: "center",
@@ -229,8 +241,8 @@ const cosStyles = {
   },
 
   input: {
-    backgroundColor: "#c6e3fa",
     border: "none",
+    backgroundColor: "#fffffff7",
     borderRadius: "5px",
     height: "100%",
     width: "100%",
@@ -242,7 +254,7 @@ const cosStyles = {
     marginLeft: "13vh",
     border: "none",
     color: "black",
-    backgroundColor: "#c6e3fa",
+    backgroundColor: "#f2d577",
     borderRadius: "10px",
     fontFamily: `"Trebuchet MS", Helvetica, sans-serif`,
   },
@@ -257,5 +269,6 @@ const cosStyles = {
     justifyContent: "center",
     alignItems: "center",
     height: "100%",
+    marginTop: "5rem",
   },
 };

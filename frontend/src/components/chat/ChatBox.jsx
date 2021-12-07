@@ -1,13 +1,10 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext } from "react";
 import { useParams } from "react-router-dom";
-import { useMessage } from "../../contexts/MessageContext";
 import { UserContext } from "../../contexts/UserContext";
 
 function ChatBox(props) {
   const { roomid } = useParams();
   const { currentUser } = useContext(UserContext);
-  const { chatRooms } = useMessage();
-
 
   function emitChatRoom(room) {
     props.emitFromChatBox(room);
@@ -31,8 +28,8 @@ function ChatBox(props) {
 
   return (
     <div className="chatsWrapper" style={styles.chatsWrapper}>
-      {chatRooms && chatRooms.length > 0
-        ? chatRooms.map((room) => (
+      {currentUser.chatrooms && currentUser.chatrooms.length > 0
+        ? currentUser.chatrooms.map((room) => (
             <div
               key={room.id}
               className="userWrapper"
@@ -43,7 +40,7 @@ function ChatBox(props) {
                 src="https://www.pngkit.com/png/full/128-1280585_user-icon-fa-fa-user-circle.png"
                 alt=""
                 style={styles.img}
-            />
+              />
               <p>Chat with: {getOtherUserName(room)}</p>
             </div>
           ))
@@ -62,8 +59,7 @@ const styles = {
     alignItems: "center",
     padding: "2vw 3vw 0 5vw",
     gap: "4vw",
-
-    backgroundColor: "#d7e6f2",
+    backgroundColor: "#e0f379",
     borderRadius: "10px",
     cursor: "pointer",
   },
@@ -75,8 +71,7 @@ const styles = {
     alignItems: "center",
     padding: "2vw 3vw 0 5vw",
     gap: "4vw",
-
-    backgroundColor: "white",
+    backgroundColor: "#e0f37987",
     borderRadius: "10px",
     cursor: "pointer",
   },

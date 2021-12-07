@@ -15,8 +15,8 @@ function ChatMessage(props) {
               props.message.userId == currentUser.id ? "outgoing" : "incoming",
             position: "single",
           }}
+          style={props.message.userId == currentUser.id ? styles.messageOutgoing : styles.messageIncoming}
         >
-          <Message.Header sender={props.otherUser} />
         </Message>
       )}
     </>
@@ -24,3 +24,26 @@ function ChatMessage(props) {
 }
 
 export default ChatMessage;
+
+
+const styles = {
+  messageOutgoing: {
+    margin: "1rem",
+    padding: "1rem",
+    width: "20rem",
+    display: "flex",
+    flexWrap: "wrap",
+    backgroundColor: "#e0f379",
+    borderRadius: "15px",
+    marginLeft: "auto",
+  },
+  messageIncoming: {
+    margin: "1rem",
+    padding: "1rem",
+    width: "20rem",
+    display: "flex",
+    flexWrap: "wrap",
+    backgroundColor: "#f2d577",
+    borderRadius: "15px",
+  },
+};
